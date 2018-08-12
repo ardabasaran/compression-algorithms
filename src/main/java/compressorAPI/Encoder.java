@@ -1,4 +1,4 @@
-package compressor_api;
+package compressorAPI;
 
 public interface Encoder {
     EncodeResponse encode(EncodeRequest request);
