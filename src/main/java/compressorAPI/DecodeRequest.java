@@ -1,4 +1,4 @@
-package compressor_api;
+package compressorAPI;
 
 public interface DecodeRequest {
 }
