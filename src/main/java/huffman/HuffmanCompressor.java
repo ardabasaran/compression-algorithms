@@ -3,8 +3,6 @@ package huffman;
 import compressorAPI.Compressor;
 
 import java.io.*;
-import java.util.Map;
-import java.util.PriorityQueue;
 
 /**
  * Compressor using the Huffman Coding algorithm.
@@ -18,7 +16,7 @@ public class HuffmanCompressor implements Compressor {
 
             OutputStream outputStream = new FileOutputStream(output);
             InputStream encodeStream = new FileInputStream(input);
-            encoder.encodeFile(encodeStream, outputStream);
+            encoder.encode(encodeStream, outputStream);
         } catch (IOException e) {
             System.err.println(e.getMessage());
             System.exit(0);
@@ -33,7 +31,7 @@ public class HuffmanCompressor implements Compressor {
 
             InputStream decodeStream = new FileInputStream(input);
             OutputStream outputStream = new FileOutputStream(output);
-            decoder.decodeFile(decodeStream, outputStream);
+            decoder.decode(decodeStream, outputStream);
         } catch (IOException e) {
             System.err.println(e.getMessage());
             System.exit(0);

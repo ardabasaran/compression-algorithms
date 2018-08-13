@@ -7,11 +7,13 @@ import compressorAPI.Encoder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.PriorityQueue;
 
 public class HuffmanEncoder implements Encoder {
     private HuffmanTree tree;
+
     public HuffmanEncoder(InputStream inputStream) {
         Map<Byte, Integer> frequencyMap = getFrequencyMap(inputStream);
         try {
@@ -22,15 +24,23 @@ public class HuffmanEncoder implements Encoder {
         PriorityQueue<HuffmanNode> nodeHeap = buildNodeHeap(frequencyMap);
         tree = new HuffmanTree(nodeHeap);
     }
+
     @Override
     public void encode(InputStream inputStream, OutputStream outputStream) {
         try {
+            tree.printHeader(outputStream);
+            StringBuilder encodedByte = new StringBuilder();
             int data = inputStream.read();
             while (data != -1) {
                 Byte dataByte = (byte) data;
-                outputStream.write(tree.encode(dataByte));
+                encodedByte.append(tree.encode(dataByte));
+                if (encodedByte.length() > 8) {
+                    outputStream.write(encodedByte.toString().substring(0,8).getBytes(StandardCharsets.UTF_8)[0]);
+                    encodedByte = new StringBuilder().append(encodedByte.toString().substring(8));
+                }
                 data = inputStream.read();
             }
+            outputStream.write(encodedByte.toString().getBytes(StandardCharsets.UTF_8)[0]);
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
