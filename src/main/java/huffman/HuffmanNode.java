@@ -7,6 +7,9 @@ public class HuffmanNode implements Comparable<HuffmanNode> {
     private HuffmanNode leftChild;
     private HuffmanNode rightChild;
 
+    public HuffmanNode() {
+    }
+
     public HuffmanNode(Byte dataByte, Integer value) {
         this.dataByte = dataByte;
         this.value = value;

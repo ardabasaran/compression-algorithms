@@ -3,9 +3,6 @@ package huffman;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class HuffmanTree {
@@ -26,6 +23,40 @@ public class HuffmanTree {
         this.encodings = getCanonicalEncoding(traversal);
     }
 
+    public HuffmanTree(Map<Byte, String> encodings) {
+        this.encodings = encodings;
+        this.root = new HuffmanNode();
+        List<ByteWithEncoding> list = Lists.newArrayList();
+        for (Map.Entry<Byte, String> entry : encodings.entrySet()) {
+            list.add(new ByteWithEncoding(entry.getKey(), entry.getValue()));
+        }
+        root = recursiveBuild(list);
+        traversal = traverseInOrder();
+        traversal.sort(new LevelComparator());
+    }
+
+    private HuffmanNode recursiveBuild(List<ByteWithEncoding> list) {
+        HuffmanNode node;
+        if (list.size() == 1 && list.get(0).getEncoding().length() == 1) {
+            node = new HuffmanNode(list.get(0).getDataByte(), 0);
+            return node;
+        } else {
+            List<ByteWithEncoding> leftList = Lists.newArrayList();
+            List<ByteWithEncoding> rightList = Lists.newArrayList();
+            for (ByteWithEncoding byteWithEncoding : list) {
+                if (byteWithEncoding.getEncoding().charAt(0) == '0') {
+                    leftList.add(byteWithEncoding);
+                } else {
+                    rightList.add(byteWithEncoding);
+                }
+            }
+            HuffmanNode leftNode = recursiveBuild(leftList);
+            HuffmanNode rightNode = recursiveBuild(rightList);
+            node = new HuffmanNode(leftNode, rightNode);
+            return node;
+        }
+    }
+
     private class LevelComparator implements Comparator<HuffmanNode> {
         @Override
         public int compare(HuffmanNode o1, HuffmanNode o2) {
@@ -43,6 +74,22 @@ public class HuffmanTree {
 
     public String encode(Byte dataByte) {
         return encodings.get(dataByte);
+    }
+
+    public HuffmanTreeDecodeResponse decode(String toDecode) {
+        HuffmanNode node = root;
+        int level = 0;
+        while (toDecode.length() > level) {
+            if (toDecode.charAt(level) == '0') {
+                node = root.getLeftChild();
+            } else {
+                node = root.getRightChild();
+            }
+            if (node.isLeaf()) {
+                return new HuffmanTreeDecodeResponse(node.getDataByte(), toDecode.substring(level));
+            }
+        }
+        return new HuffmanTreeDecodeResponse(toDecode);
     }
 
     public List<HuffmanNode> traverseInOrder() {
@@ -74,23 +121,8 @@ public class HuffmanTree {
         return map;
     }
 
-    public void printHeader(OutputStream output) {
-        try {
-            byte[] header = getHeader();
-            int headerLength = header.length;
-            output.write(headerLength);
-            output.write(header);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-    }
-
-    private byte[] getHeader() {
-        StringBuilder builder = new StringBuilder();
-        for (HuffmanNode node : traversal) {
-            builder.append(node.getDataByte() + ":" + node.getLevel() + ",");
-        }
-        return builder.toString().getBytes(StandardCharsets.UTF_8);
+    public List<HuffmanNode> getTraversal() {
+        return traversal;
     }
 
     private String addOneToEncoding(String encoding) {
@@ -107,5 +139,23 @@ public class HuffmanTree {
             lastIndex--;
         }
         return builder.reverse().toString();
+    }
+
+    private class ByteWithEncoding {
+        Byte dataByte;
+        String encoding;
+
+        public ByteWithEncoding(Byte dataByte, String encoding) {
+            this.dataByte = dataByte;
+            this.encoding = encoding;
+        }
+
+        public Byte getDataByte() {
+            return dataByte;
+        }
+
+        public String getEncoding() {
+            return encoding;
+        }
     }
 }

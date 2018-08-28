@@ -8,13 +8,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
 public class HuffmanEncoder implements Encoder {
+    private int fileLength;
     private HuffmanTree tree;
 
     public HuffmanEncoder(InputStream inputStream) {
+        fileLength = 0;
         Map<Byte, Integer> frequencyMap = getFrequencyMap(inputStream);
         try {
             inputStream.close();
@@ -28,7 +31,7 @@ public class HuffmanEncoder implements Encoder {
     @Override
     public void encode(InputStream inputStream, OutputStream outputStream) {
         try {
-            tree.printHeader(outputStream);
+            printHeader(tree.getTraversal(), fileLength, outputStream);
             StringBuilder encodedByte = new StringBuilder();
             int data = inputStream.read();
             while (data != -1) {
@@ -60,6 +63,7 @@ public class HuffmanEncoder implements Encoder {
         try {
             int data = inputStream.read();
             while (data != -1) {
+                fileLength += 1;
                 Byte dataByte = (byte) data;
                 frequencies.putIfAbsent(dataByte, 0);
                 frequencies.put(dataByte, frequencies.get(dataByte) + 1);
@@ -69,5 +73,26 @@ public class HuffmanEncoder implements Encoder {
             System.err.println(e.getMessage());
         }
         return frequencies;
+    }
+
+    public void printHeader(List<HuffmanNode> traversal, int fileLength, OutputStream output) {
+        try {
+            byte[] header = getHeader(traversal);
+            int headerLength = header.length;
+            output.write(headerLength);
+            output.write(header);
+            output.write(fileLength);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+
+    private byte[] getHeader(List<HuffmanNode> traversal) {
+        StringBuilder builder = new StringBuilder();
+        for (HuffmanNode node : traversal) {
+            builder.append(node.getDataByte() + ":" + node.getLevel() + ",");
+        }
+        return builder.toString().getBytes(StandardCharsets.UTF_8);
     }
 }
