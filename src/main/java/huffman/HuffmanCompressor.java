@@ -14,7 +14,7 @@ public class HuffmanCompressor implements Compressor {
       InputStream frequencyStream = new FileInputStream(input);
       HuffmanEncoder encoder = new HuffmanEncoder(frequencyStream);
 
-      DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(output));
+      OutputStream outputStream = new FileOutputStream(output);
       InputStream encodeStream = new FileInputStream(input);
       encoder.encode(encodeStream, outputStream);
     } catch (IOException e) {
