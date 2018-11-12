@@ -1,16 +1,13 @@
 package huffman;
 
-public class HuffmanTreeDecodeResponse {
-    public Byte decoded;
-    public String remaining;
+import org.immutables.value.Value;
 
-    public HuffmanTreeDecodeResponse(String remaining) {
-        this.decoded = null;
-        this.remaining = remaining;
-    }
+@Value.Immutable
+public interface HuffmanTreeDecodeResponse {
+  Byte getDecoded();
 
-    public HuffmanTreeDecodeResponse(Byte decoded, String remaining) {
-        this.decoded = decoded;
-        this.remaining = remaining;
-    }
+  @Value.Default
+  default String getRemaining() {
+    return "";
+  }
 }
