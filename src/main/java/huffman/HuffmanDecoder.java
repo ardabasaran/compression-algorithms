@@ -1,7 +1,7 @@
 package huffman;
 
 import com.google.common.collect.Maps;
-import compressorAPI.Decoder;
+import compressor.Decoder;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -60,6 +60,10 @@ public class HuffmanDecoder implements Decoder {
         // read next byte
         data = is.read();
       }
+
+      is.close();
+      inputStream.close();
+      outputStream.close();
     } catch (IOException e) {
       System.err.println(e.getMessage());
     }
@@ -74,6 +78,7 @@ public class HuffmanDecoder implements Decoder {
         String encoded = is.readUTF();
         encoding.put(byteData, encoded);
       }
+      is.close();
     } catch (IOException e) {
       System.err.println(e.getMessage());
     }

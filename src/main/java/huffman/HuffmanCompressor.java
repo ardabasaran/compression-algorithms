@@ -1,6 +1,6 @@
 package huffman;
 
-import compressorAPI.Compressor;
+import compressor.Compressor;
 
 import java.io.*;
 

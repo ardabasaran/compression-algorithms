@@ -1,4 +1,4 @@
-package compressorAPI;
+package compressor;
 
 import java.io.InputStream;
 import java.io.OutputStream;

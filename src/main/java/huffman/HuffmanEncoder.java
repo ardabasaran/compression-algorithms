@@ -1,15 +1,14 @@
 package huffman;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-import compressorAPI.Encoder;
+import compressor.CompressorUtil;
+import compressor.Encoder;
+import compressor.FrequencyResponse;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -18,8 +17,10 @@ public class HuffmanEncoder implements Encoder {
   private HuffmanTree tree;
 
   public HuffmanEncoder(InputStream inputStream) {
-    fileLength = 0;
-    Map<Byte, Integer> frequencyMap = getFrequencyMap(inputStream);
+    FrequencyResponse freqResponse = CompressorUtil.getFrequencyMap(inputStream);
+    Map<Byte, Integer> frequencyMap = freqResponse.getFrequencyMap();
+    fileLength = freqResponse.getNumberOfBytesRead();
+
     try {
       inputStream.close();
     } catch (IOException e) {
@@ -37,7 +38,6 @@ public class HuffmanEncoder implements Encoder {
       StringBuilder encodedByte = new StringBuilder();
       int data = inputStream.read();
       while (data != -1) {
-        //
         encodedByte.append(tree.encode((byte) data));
 
         // if  we have more than 8 bits, we can write to output stream
@@ -77,6 +77,9 @@ public class HuffmanEncoder implements Encoder {
         byte toWrite = (byte) Integer.parseInt(lastByte.toString(), 2);
         os.write(toWrite);
       }
+
+      inputStream.close();
+      outputStream.close();
     } catch (IOException e) {
       System.err.println(e.getMessage());
     }
@@ -89,23 +92,6 @@ public class HuffmanEncoder implements Encoder {
       queue.add(node);
     }
     return queue;
-  }
-
-  private Map<Byte, Integer> getFrequencyMap(InputStream inputStream) {
-    Map<Byte, Integer> frequencies = Maps.newHashMap();
-    try {
-      int data = inputStream.read();
-      while (data != -1) {
-        fileLength += 1;
-        Byte dataByte = (byte) data;
-        frequencies.putIfAbsent(dataByte, 0);
-        frequencies.put(dataByte, frequencies.get(dataByte) + 1);
-        data = inputStream.read();
-      }
-    } catch (IOException e) {
-      System.err.println(e.getMessage());
-    }
-    return frequencies;
   }
 
   private void printHeader(Map<Byte, String> encodings, int fileLength, DataOutputStream os) {

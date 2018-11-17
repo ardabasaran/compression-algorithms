@@ -1,7 +1,4 @@
-package compressorAPI;
-
-import java.io.InputStream;
-import java.io.OutputStream;
+package compressor;
 
 /**
  * Interface for lossless compression.
