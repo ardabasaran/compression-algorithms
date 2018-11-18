@@ -78,6 +78,7 @@ public class HuffmanEncoder implements Encoder {
         os.write(toWrite);
       }
 
+      os.close();
       inputStream.close();
       outputStream.close();
     } catch (IOException e) {

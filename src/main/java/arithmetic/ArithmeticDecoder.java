@@ -80,6 +80,9 @@ public class ArithmeticDecoder implements Decoder {
           value = value.plus(ArithmeticInteger.fromInt(getNextBit(is)));
         }
       }
+      is.close();
+      inputStream.close();
+      outputStream.close();
     } catch (IOException e) {
       System.err.println(e.getMessage());
     }

@@ -11,21 +11,15 @@ import java.util.Map;
 
 public class HuffmanDecoder implements Decoder {
   private Map<Byte, String> encoding;
-  private HuffmanTree tree;
   private int fileLength;
-
-  public HuffmanDecoder(InputStream inputStream) {
-    DataInputStream is = new DataInputStream(inputStream);
-    encoding = Maps.newHashMap();
-    decodeHeader(is);
-    tree = new HuffmanTree(encoding);
-  }
 
   @Override
   public void decode(InputStream inputStream, OutputStream outputStream) {
     try {
       DataInputStream is = new DataInputStream(inputStream);
+      encoding = Maps.newHashMap();
       decodeHeader(is);
+      HuffmanTree tree = new HuffmanTree(encoding);
       int decodedData = 0;
       int data = is.read();
       StringBuilder toDecode = new StringBuilder();
@@ -78,7 +72,6 @@ public class HuffmanDecoder implements Decoder {
         String encoded = is.readUTF();
         encoding.put(byteData, encoded);
       }
-      is.close();
     } catch (IOException e) {
       System.err.println(e.getMessage());
     }

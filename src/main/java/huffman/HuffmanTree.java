@@ -79,6 +79,9 @@ public class HuffmanTree {
       // nodes start with '0' goes to left, others go to right
       for (ByteWithEncoding byteWithEncoding : list) {
         if (byteWithEncoding.getEncoding().charAt(0) == '0') {
+          if (byteWithEncoding.getEncoding().length() > 1) {
+            byteWithEncoding.setEncoding(byteWithEncoding.getEncoding().substring(1));
+          }
           leftList.add(byteWithEncoding);
         } else {
           byteWithEncoding.setEncoding(byteWithEncoding.getEncoding().substring(1));

@@ -4,10 +4,7 @@ import compressor.CompressorUtil;
 import compressor.Encoder;
 import compressor.FrequencyResponse;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Map;
 
 public class ArithmeticEncoder implements Encoder {
@@ -29,6 +26,7 @@ public class ArithmeticEncoder implements Encoder {
       System.err.println(e.getMessage());
     }
   }
+
   @Override
   public void encode(InputStream inputStream, OutputStream outputStream) {
     DataOutputStream os = new DataOutputStream(outputStream);
@@ -45,14 +43,6 @@ public class ArithmeticEncoder implements Encoder {
         //ArithmeticInteger range = high.minus(low).plus(ArithmeticInteger.fromInt(1));
         ArithmeticInteger range = high.minus(low).plus(ArithmeticInteger.fromInt(1));
         ArithmeticProbability probability = model.getProbability(dataByte);
-
-//        System.out.println("high: " + high.toBinaryString());
-//        System.out.println("low: " + low.toBinaryString());
-//        System.out.println("range: " + low.toBinaryString());
-//        System.out.println("upper: " + probability.getUpper().toBinaryString());
-//        System.out.println("lower: " + probability.getLower().toBinaryString());
-//        System.out.println("den: " + probability.getDenominator().toBinaryString());
-//        System.out.println();
 
         // high = low + (range * p.upper)/p.denominator;
         high = low.plus(
@@ -96,6 +86,12 @@ public class ArithmeticEncoder implements Encoder {
       else {
         outputBitAndPending(1, os);
       }
+
+      printRemaining(os);
+
+      os.close();
+      inputStream.close();
+      outputStream.close();
     } catch (IOException e) {
       System.err.println(e.getMessage());
     }
@@ -109,7 +105,28 @@ public class ArithmeticEncoder implements Encoder {
     }
     try {
       // encode and write the remaining data
-      while (encodedByte.length() > 8) {
+      while (encodedByte.length() >= 8) {
+        // we parse int then cast to byte because byte is signed (so 11111111 can cause error)
+        byte toWrite = (byte) Integer.parseInt(encodedByte.toString().substring(0, 8), 2);
+
+        // write to output stream
+        os.write(toWrite);
+
+        // get the remaining part of the stream
+        encodedByte = new StringBuilder().append(encodedByte.toString().substring(8));
+      }
+    } catch (IOException e) {
+      System.err.println(e.getMessage());
+    }
+  }
+
+  private void printRemaining(DataOutputStream os) {
+    try {
+      while (encodedByte.length() < 8) {
+        encodedByte.append(0);
+      }
+      // encode and write the remaining data
+      while (encodedByte.length() >= 8) {
         // we parse int then cast to byte because byte is signed (so 11111111 can cause error)
         byte toWrite = (byte) Integer.parseInt(encodedByte.toString().substring(0, 8), 2);
 

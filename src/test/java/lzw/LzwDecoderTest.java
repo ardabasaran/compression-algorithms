@@ -1,4 +1,4 @@
-package huffman;
+package lzw;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.*;
 
-public class HuffmanDecoderTest {
+public class LzwDecoderTest {
   InputStream decodeHs;
   InputStream decodeIs;
 
@@ -19,7 +19,7 @@ public class HuffmanDecoderTest {
     String inputString = "aaaabbbccbaabcbab";
     InputStream hs = new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
     InputStream is = new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
-    HuffmanEncoder encoder = new HuffmanEncoder(hs);
+    LzwEncoder encoder = new LzwEncoder();
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     encoder.encode(is, os);
@@ -30,7 +30,7 @@ public class HuffmanDecoderTest {
 
   @Test
   public void decode() {
-    HuffmanDecoder decoder = new HuffmanDecoder();
+    LzwDecoder decoder = new LzwDecoder();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     decoder.decode(decodeIs, os);
     String decoded = os.toString(StandardCharsets.UTF_8);
